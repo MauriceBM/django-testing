@@ -8,6 +8,9 @@ class News(models.Model):
     title = models.CharField(max_length=50)
     text = models.TextField()
     date = models.DateField(default=datetime.today)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
 
     class Meta:
         ordering = ('-date',)
