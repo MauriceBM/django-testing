@@ -7,8 +7,8 @@ def check_structure():
     errors = []
     success = []
 
-    ya_news_path = os.path.join("ya_news", "news")
-    ya_note_path = os.path.join("ya_note", "notes")
+    ya_news_path = os.path.join("ya-news", "news")
+    ya_note_path = os.path.join("ya-note", "notes")
 
     required_items = [
         "requirements.txt",
