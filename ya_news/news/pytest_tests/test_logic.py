@@ -37,8 +37,6 @@ def test_authenticated_user_can_post_comment(author_client, news):
 def test_comment_with_bad_words_not_published(
     author_client, news, bad_words_data
 ):
-    """Если комментарий содержит запрещённые слова, он не публикуется,
-    а форма возвращает ошибку."""
     url = reverse('news:detail', args=(news.id,))
     for bad_word in bad_words_data:
         data = {'text': f'Плохое слово: {bad_word}'}
