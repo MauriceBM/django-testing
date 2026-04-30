@@ -7,9 +7,18 @@ User = get_user_model()
 
 @pytest.fixture
 def author(db):
-    return User.objects.create_user(username='author', password='pass123')
+    """Фикстура: пользователь-автор."""
+    return User.objects.create_user(
+        username='author',
+        password='pass123'
+    )
 
 
 @pytest.fixture
 def news(db, author):
-    return News.objects.create(title='Test', text='Text', author=author)
+    """Фикстура: тестовая новость."""
+    return News.objects.create(
+        title='Test',
+        text='Text',
+        author=author
+    )
