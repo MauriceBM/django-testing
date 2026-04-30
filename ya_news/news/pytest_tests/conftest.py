@@ -7,16 +7,9 @@ User = get_user_model()
 
 @pytest.fixture
 def author(db):
-    return User.objects.create_user(
-        username='author',
-        password='pass123'
-    )
+    return User.objects.create_user(username='author', password='pass123')
 
 
 @pytest.fixture
 def news(db, author):
-    return News.objects.create(
-        title='Test',
-        text='Text',
-        author=author
-    )
+    return News.objects.create(title='Test', text='Text', author=author)

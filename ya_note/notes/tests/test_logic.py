@@ -11,20 +11,9 @@ class TestLogic(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.author = User.objects.create_user(
-            username='author',
-            password='pass123'
-        )
-        cls.other = User.objects.create_user(
-            username='other',
-            password='pass123'
-        )
-        cls.note = Note.objects.create(
-            title='Test',
-            text='Text',
-            slug='test',
-            author=cls.author
-        )
+        cls.author = User.objects.create_user(username='author', password='pass123')
+        cls.other = User.objects.create_user(username='other', password='pass123')
+        cls.note = Note.objects.create(title='Test', text='Text', slug='test', author=cls.author)
 
     def test_author_can_edit(self):
         self.client.force_login(self.author)

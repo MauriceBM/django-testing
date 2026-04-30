@@ -11,16 +11,8 @@ class TestContent(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = User.objects.create_user(
-            username='user',
-            password='pass123'
-        )
-        cls.note = Note.objects.create(
-            title='Test',
-            text='Text',
-            slug='test',
-            author=cls.user
-        )
+        cls.user = User.objects.create_user(username='user', password='pass123')
+        cls.note = Note.objects.create(title='Test', text='Text', slug='test', author=cls.user)
 
     def test_note_in_list(self):
         self.client.force_login(self.user)
