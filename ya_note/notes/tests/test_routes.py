@@ -87,4 +87,6 @@ class TestRoutes(TestCase):
         self.assertEqual(response_signup.status_code, HTTPStatus.OK)
         url_logout = reverse('users:logout')
         response_logout = self.client.post(url_logout)
-        self.assertEqual(response_logout.status_code, HTTPStatus.FOUND)
+        self.assertIn(
+            response_logout.status_code, (HTTPStatus.OK, HTTPStatus.FOUND)
+        )

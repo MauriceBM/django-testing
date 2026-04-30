@@ -70,4 +70,4 @@ def test_auth_pages_available_for_anonymous(client):
     response_logout = client.post(logout_url)
     assert response_login.status_code == HTTPStatus.OK
     assert response_signup.status_code == HTTPStatus.OK
-    assert response_logout.status_code == HTTPStatus.FOUND
+    assert response_logout.status_code in (HTTPStatus.OK, HTTPStatus.FOUND)

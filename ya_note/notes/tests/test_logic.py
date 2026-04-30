@@ -51,8 +51,8 @@ class TestLogic(TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertFormError(
-            response.context['form'], 'slug',
-            'Заметка с таким slug уже существует'
+            response, 'form', 'slug',
+            'test - такой slug уже существует, придумайте уникальное значение!'
         )
         self.assertEqual(Note.objects.count(), 1)
 

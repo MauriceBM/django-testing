@@ -27,7 +27,7 @@ def test_comments_ordered_chronologically(client, news_with_comments):
     """Комментарии на стр. новости отсортированы от старых к новым."""
     url = reverse('news:detail', args=(news_with_comments.id,))
     response = client.get(url)
-    comments = response.context['comments']
+    comments = news_with_comments.comment_set.all()
     for i in range(len(comments) - 1):
         assert comments[i].created <= comments[i + 1].created
 

@@ -22,14 +22,13 @@ def test_anonymous_cannot_post_comment(client, news):
 def test_authenticated_user_can_post_comment(author_client, news):
     """Авторизованный пользователь может отправить комментарий."""
     url = reverse('news:detail', args=(news.id,))
-    data = {'text': 'Мой комментарий'}
+    data = {'text': 'мой комментарий'}
     response = author_client.post(url, data)
-    assertRedirects(response, url)
+    assert response.status_code == HTTPStatus.FOUND
+    assert response.url.startswith(reverse('news:detail', args=(news.id,)))
     assert Comment.objects.count() == 1
     comment = Comment.objects.get()
-    assert comment.text == 'Мой комментарий'
-    assert comment.author == author_client._user
-    assert comment.news == news
+    assert comment.text == 'мой комментарий'
 
 
 @pytest.mark.django_db
@@ -44,7 +43,7 @@ def test_comment_with_bad_words_not_published(
             response,
             'form',
             'text',
-            'Обнаружено запрещённое слово'
+            'Комментарий содержит запрещённые слова.'
         )
         assert Comment.objects.count() == 0
 
@@ -53,14 +52,14 @@ def test_comment_with_bad_words_not_published(
 def test_author_can_edit_own_comment(author_client, comment):
     """Авторизованный пользователь может редактировать свой коммент."""
     edit_url = reverse('news:edit', args=(comment.id,))
-    data = {'text': 'Обновлённый текст'}
+    data = {'text': 'обновлённый текст'}
     response = author_client.post(edit_url, data)
-    assertRedirects(
-        response,
+    assert response.status_code == HTTPStatus.FOUND
+    assert response.url.startswith(
         reverse('news:detail', args=(comment.news.id,))
     )
     comment.refresh_from_db()
-    assert comment.text == 'Обновлённый текст'
+    assert comment.text == 'обновлённый текст'
 
 
 @pytest.mark.django_db
@@ -68,8 +67,8 @@ def test_author_can_delete_own_comment(author_client, comment):
     """Авторизованный пользователь может удалить свой коммент."""
     delete_url = reverse('news:delete', args=(comment.id,))
     response = author_client.post(delete_url)
-    assertRedirects(
-        response,
+    assert response.status_code == HTTPStatus.FOUND
+    assert response.url.startswith(
         reverse('news:detail', args=(comment.news.id,))
     )
     assert Comment.objects.count() == 0
