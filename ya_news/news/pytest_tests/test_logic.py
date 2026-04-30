@@ -39,12 +39,12 @@ def test_comment_with_bad_words_not_published(
     for bad_word in bad_words_data:
         data = {'text': f'Плохое слово: {bad_word}'}
         response = author_client.post(url, data)
-        assertFormError(
-            response,
-            'form',
-            'text',
-            'Комментарий содержит запрещённые слова.'
-        )
+        # Vérification manuelle des erreurs du formulaire
+        form = response.context.get('form')
+        assert form is not None
+        assert 'text' in form.errors
+        error_msg = 'Комментарий содержит запрещённые слова.'
+        assert form.errors['text'][0] == error_msg
         assert Comment.objects.count() == 0
 
 
