@@ -50,10 +50,13 @@ class TestLogic(TestCase):
         data = {'title': 'Duplicate', 'text': 'Text', 'slug': self.note.slug}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertFormError(
-            response, 'form', 'slug',
-            'test - такой slug уже существует, придумайте уникальное значение!'
+        form = response.context['form']
+        self.assertIn('slug', form.errors)
+        error_msg = (
+            'test - такой slug уже существует, '
+            'придумайте уникальное значение!'
         )
+        self.assertEqual(form.errors['slug'][0], error_msg)
         self.assertEqual(Note.objects.count(), 1)
 
     def test_slug_auto_generated_if_empty(self):
