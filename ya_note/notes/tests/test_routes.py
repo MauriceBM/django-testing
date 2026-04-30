@@ -8,28 +8,25 @@ User = get_user_model()
 
 
 class TestRoutes(TestCase):
-    """Тесты маршрутов YaNote."""
 
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user(
-            username='testuser',
-            password='testpass123'
+            username='user',
+            password='pass123'
         )
         cls.note = Note.objects.create(
             title='Test',
             text='Text',
-            slug='test-slug',
+            slug='test',
             author=cls.user
         )
 
-    def test_list_page_status(self):
-        """Страница списка возвращает 200."""
+    def test_list_status(self):
         response = self.client.get(reverse('notes:list'))
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_detail_page_status(self):
-        """Страница заметки возвращает 200 для автора."""
+    def test_detail_status(self):
         self.client.force_login(self.user)
         url = reverse('notes:detail', args=(self.note.slug,))
         response = self.client.get(url)

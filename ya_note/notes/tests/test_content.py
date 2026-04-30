@@ -8,30 +8,27 @@ User = get_user_model()
 
 
 class TestContent(TestCase):
-    """Тесты контента YaNote."""
 
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user(
-            username='testuser',
-            password='testpass123'
+            username='user',
+            password='pass123'
         )
         cls.note = Note.objects.create(
             title='Test',
             text='Text',
-            slug='test-slug',
+            slug='test',
             author=cls.user
         )
 
-    def test_note_in_object_list(self):
-        """Заметка автора есть в списке."""
+    def test_note_in_list(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse('notes:list'))
         object_list = response.context['object_list']
         self.assertIn(self.note, object_list)
 
     def test_form_in_context(self):
-        """Форма есть в контексте страницы создания."""
         self.client.force_login(self.user)
         response = self.client.get(reverse('notes:add'))
         self.assertIn('form', response.context)
