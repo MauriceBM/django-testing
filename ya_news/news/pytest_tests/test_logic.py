@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertRedirects, assertFormError
+from pytest_django.asserts import assertRedirects
 
 from news.models import Comment
 
@@ -25,7 +25,9 @@ def test_authenticated_user_can_post_comment(author_client, news):
     data = {'text': 'мой комментарий'}
     response = author_client.post(url, data)
     assert response.status_code == HTTPStatus.FOUND
-    assert response.url.startswith(reverse('news:detail', args=(news.id,)))
+    assert response.url.startswith(
+        reverse('news:detail', args=(news.id,))
+    )
     assert Comment.objects.count() == 1
     comment = Comment.objects.get()
     assert comment.text == 'мой комментарий'
@@ -35,11 +37,12 @@ def test_authenticated_user_can_post_comment(author_client, news):
 def test_comment_with_bad_words_not_published(
     author_client, news, bad_words_data
 ):
+    """Если комментарий содержит запрещённые слова, он не публикуется,
+    а форма возвращает ошибку."""
     url = reverse('news:detail', args=(news.id,))
     for bad_word in bad_words_data:
         data = {'text': f'Плохое слово: {bad_word}'}
         response = author_client.post(url, data)
-        # Vérification manuelle des erreurs du formulaire
         form = response.context.get('form')
         assert form is not None
         assert 'text' in form.errors
@@ -50,7 +53,7 @@ def test_comment_with_bad_words_not_published(
 
 @pytest.mark.django_db
 def test_author_can_edit_own_comment(author_client, comment):
-    """Авторизованный пользователь может редактировать свой коммент."""
+    """Авторизованный пользователь может редактировать свой комментарий."""
     edit_url = reverse('news:edit', args=(comment.id,))
     data = {'text': 'обновлённый текст'}
     response = author_client.post(edit_url, data)
@@ -64,7 +67,7 @@ def test_author_can_edit_own_comment(author_client, comment):
 
 @pytest.mark.django_db
 def test_author_can_delete_own_comment(author_client, comment):
-    """Авторизованный пользователь может удалить свой коммент."""
+    """Авторизованный пользователь может удалить свой комментарий."""
     delete_url = reverse('news:delete', args=(comment.id,))
     response = author_client.post(delete_url)
     assert response.status_code == HTTPStatus.FOUND
@@ -78,7 +81,7 @@ def test_author_can_delete_own_comment(author_client, comment):
 def test_other_user_cannot_edit_others_comment(
     not_author_client, comment
 ):
-    """Авториз. пользователь не может редактировать чужой коммент."""
+    """Другой пользователь не может редактировать чужой комментарий."""
     edit_url = reverse('news:edit', args=(comment.id,))
     data = {'text': 'Попытка взлома'}
     response = not_author_client.post(edit_url, data)
@@ -91,7 +94,7 @@ def test_other_user_cannot_edit_others_comment(
 def test_other_user_cannot_delete_others_comment(
     not_author_client, comment
 ):
-    """Авториз. пользователь не может удалить чужой коммент."""
+    """Другой пользователь не может удалить чужой комментарий."""
     delete_url = reverse('news:delete', args=(comment.id,))
     response = not_author_client.post(delete_url)
     assert response.status_code == HTTPStatus.NOT_FOUND
