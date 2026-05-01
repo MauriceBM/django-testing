@@ -6,7 +6,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_news_limit_on_home_page(client, many_news):
-    """Количество новостей на главной странице — не более 10."""
+    """Количество новостей sur главной странице — не более 10."""
     url = reverse('news:home')
 
     response = client.get(url)
@@ -16,7 +16,7 @@ def test_news_limit_on_home_page(client, many_news):
 
 
 def test_news_ordered_from_newest_to_oldest(client, many_news):
-    """Новости отсортированы от самой свежей к самой старой."""
+    """Новости отсортированы par date décroissante."""
     url = reverse('news:home')
 
     response = client.get(url)
@@ -27,7 +27,7 @@ def test_news_ordered_from_newest_to_oldest(client, many_news):
 
 
 def test_comments_ordered_chronologically(client, news_with_comments):
-    """Комментарии на стр. новости отсортированы от старых к новым."""
+    """Комментарии на стр. новости отсортированы par date croissante."""
     news = news_with_comments
 
     comments = news.comment_set.all()

@@ -82,9 +82,3 @@ def news_with_comments(db, author, not_author, news):
         comment.created = date
         comment.save()
     return news
-
-
-@pytest.fixture
-def bad_words_data():
-    """Список запрещённых слов (константа уровня модуля)."""
-    return BAD_WORDS
