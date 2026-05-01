@@ -4,8 +4,11 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
+pytestmark = pytest.mark.django_db
 
-@pytest.mark.django_db
+LOGIN_URL = reverse('users:login')
+
+
 def test_home_availability_for_anonymous(client):
     """Главная страница доступна анонимному пользователю."""
     url = reverse('news:home')
@@ -13,7 +16,6 @@ def test_home_availability_for_anonymous(client):
     assert response.status_code == HTTPStatus.OK
 
 
-@pytest.mark.django_db
 def test_news_detail_availability_for_anonymous(client, news):
     """Страница отдельной новости доступна анонимному пользователю."""
     url = reverse('news:detail', args=(news.id,))
@@ -21,7 +23,6 @@ def test_news_detail_availability_for_anonymous(client, news):
     assert response.status_code == HTTPStatus.OK
 
 
-@pytest.mark.django_db
 def test_comment_edit_delete_accessible_only_author(
     author_client, comment
 ):
@@ -34,7 +35,6 @@ def test_comment_edit_delete_accessible_only_author(
     assert response_delete.status_code == HTTPStatus.OK
 
 
-@pytest.mark.django_db
 def test_anonymous_redirected_to_login_for_comment_edit_delete(
     client, comment
 ):
@@ -43,11 +43,10 @@ def test_anonymous_redirected_to_login_for_comment_edit_delete(
     delete_url = reverse('news:delete', args=(comment.id,))
     for url in (edit_url, delete_url):
         response = client.get(url)
-        expected_url = f'/auth/login/?next={url}'
+        expected_url = f'{LOGIN_URL}?next={url}'
         assertRedirects(response, expected_url)
 
 
-@pytest.mark.django_db
 def test_other_user_cannot_access_comment_edit_delete(
     not_author_client, comment
 ):
@@ -59,7 +58,6 @@ def test_other_user_cannot_access_comment_edit_delete(
         assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-@pytest.mark.django_db
 def test_auth_pages_available_for_anonymous(client):
     """Стр. регистрации, входа и выхода доступны анонимным пользователям."""
     login_url = reverse('users:login')

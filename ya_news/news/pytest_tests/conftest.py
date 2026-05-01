@@ -6,6 +6,8 @@ from news.models import News, Comment
 
 User = get_user_model()
 
+BAD_WORDS = ['запрещённое_слово', 'spam', 'offensive']
+
 
 @pytest.fixture
 def author(db):
@@ -50,10 +52,10 @@ def news(db, author):
 @pytest.fixture
 def many_news(db, author):
     """11 новостей для проверки лимита на главной."""
-    all_news = []
-    for i in range(11):
-        news = News(title=f'News {i}', text='Text', author=author)
-        all_news.append(news)
+    all_news = [
+        News(title=f'News {i}', text='Text', author=author)
+        for i in range(11)
+    ]
     return News.objects.bulk_create(all_news)
 
 
@@ -68,20 +70,21 @@ def comment(db, author, news):
 @pytest.fixture
 def news_with_comments(db, author, not_author, news):
     """Новость с несколькими комментариями разной даты."""
-    c1 = Comment.objects.create(text='First', author=author, news=news)
-    c1.created = '2024-01-01 10:00:00'
-    c1.save()
-    c2 = Comment.objects.create(text='Second', author=not_author, news=news)
-    c2.created = '2024-01-02 10:00:00'
-    c2.save()
-    c3 = Comment.objects.create(text='Third', author=author, news=news)
-    c3.created = '2024-01-03 10:00:00'
-    c3.save()
+    comments_data = [
+        ('First', author, '2024-01-01 10:00:00'),
+        ('Second', not_author, '2024-01-02 10:00:00'),
+        ('Third', author, '2024-01-03 10:00:00'),
+    ]
+    for text, user, date in comments_data:
+        comment = Comment.objects.create(
+            text=text, author=user, news=news
+        )
+        comment.created = date
+        comment.save()
     return news
 
 
 @pytest.fixture
 def bad_words_data():
-    """Список запрещённых слов (берётся из настроек проекта)."""
-    from news.forms import BAD_WORDS
+    """Список запрещённых слов (константа уровня модуля)."""
     return BAD_WORDS
