@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 from notes.forms import NoteForm
-from notes.models import Note
 from notes.tests.common import (
     create_test_note, create_test_user, get_logged_client
 )
