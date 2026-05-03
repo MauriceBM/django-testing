@@ -4,12 +4,12 @@ from django.urls import reverse
 
 pytestmark = pytest.mark.django_db
 
+HOME_URL = reverse('news:home')
+
 
 def test_news_limit_on_home_page(client, many_news):
     """Количество новостей sur главной странице — не более 10."""
-    url = reverse('news:home')
-
-    response = client.get(url)
+    response = client.get(HOME_URL)
 
     news_list = response.context['object_list']
     assert news_list.count() <= settings.NEWS_COUNT_ON_HOME_PAGE
@@ -17,9 +17,7 @@ def test_news_limit_on_home_page(client, many_news):
 
 def test_news_ordered_from_newest_to_oldest(client, many_news):
     """Новости отсортированы par date décroissante."""
-    url = reverse('news:home')
-
-    response = client.get(url)
+    response = client.get(HOME_URL)
 
     news_list = list(response.context['object_list'])
     for i in range(len(news_list) - 1):

@@ -64,6 +64,7 @@ class TestRoutes(TestCase):
             'notes:list', 'notes:add', 'notes:success',
             'notes:detail', 'notes:edit', 'notes:delete'
         )
+        login_path = '/auth/login/'
         for name in pages:
             with self.subTest(page=name):
                 if name in ('notes:detail', 'notes:edit', 'notes:delete'):
@@ -71,19 +72,21 @@ class TestRoutes(TestCase):
                 else:
                     url = reverse(name)
                 response = self.client.get(url)
-                expected_url = f"/auth/login/?next={url}"
+                expected_url = f"{login_path}?next={url}"
                 self.assertRedirects(response, expected_url)
 
     def test_auth_pages_available_for_all_users(self):
-        """Стр. регистрации, входа и выхода доступны всем (в т.ч. анониму)."""
+        """Стр. регистрации, входа и выхода доступны всем."""
         login_url = reverse('users:login')
         signup_url = reverse('users:signup')
+        logout_url = reverse('users:logout')
+
         response_login = self.client.get(login_url)
         response_signup = self.client.get(signup_url)
+        response_logout = self.client.post(logout_url)
+
         self.assertEqual(response_login.status_code, HTTPStatus.OK)
         self.assertEqual(response_signup.status_code, HTTPStatus.OK)
-        logout_url = reverse('users:logout')
-        response_logout = self.client.post(logout_url)
         self.assertIn(
             response_logout.status_code, (HTTPStatus.OK, HTTPStatus.FOUND)
         )

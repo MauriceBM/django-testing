@@ -1,11 +1,9 @@
-"""Общие утилиты и данные для тестов YaNote."""
 from django.contrib.auth import get_user_model
 from django.test import Client
 
 from notes.models import Note
 
 User = get_user_model()
-
 
 SLUG_ERROR_MSG = (
     'test - такой slug уже существует, '
