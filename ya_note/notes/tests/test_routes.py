@@ -45,7 +45,7 @@ class TestRoutes(BaseTest):
                 self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_anonymous_redirected_to_login_for_protected_pages(self):
-        """Аноним перенаправляется на логин при доступе к защищённым страницам."""
+        """Аноним перенаправляется на логин при доступе."""
         for name in ALL_PROTECTED_PAGES:
             with self.subTest(page=name):
                 if name in PAGES_WITH_NOTE_ARG:

@@ -7,7 +7,6 @@ from pytest_django.asserts import assertRedirects
 from news.pytest_tests.urls import (
     HOME_URL,
     LOGIN_URL,
-    SIGNUP_URL,
     LOGOUT_URL,
     DETAIL_URL_NAME,
 )
