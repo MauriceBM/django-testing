@@ -27,19 +27,22 @@ class TestLogic(BaseTest):
 
     def test_authenticated_user_can_create_note(self):
         """Залогиненный пользователь может создать заметку."""
+        initial_count = Note.objects.count()
         response = self.author_client.post(ADD_URL, NEW_NOTE_DATA)
         self.assertRedirects(response, SUCCESS_URL)
-        self.assertEqual(Note.objects.count(), 2)
+        self.assertEqual(Note.objects.count(), initial_count + 1)
 
     def test_anonymous_user_cannot_create_note(self):
         """Анонимный пользователь не может создать заметку."""
+        initial_count = Note.objects.count()
         response = self.client.post(ADD_URL, NEW_NOTE_DATA)
         login_url = f"{reverse(LOGIN_URL_NAME)}?next={ADD_URL}"
         self.assertRedirects(response, login_url)
-        self.assertEqual(Note.objects.count(), 1)
+        self.assertEqual(Note.objects.count(), initial_count)
 
     def test_cannot_create_two_notes_with_same_slug(self):
         """Невозможно создать две заметки с одинаковым slug."""
+        initial_count = Note.objects.count()
         response = self.author_client.post(
             ADD_URL, DUPLICATE_SLUG_DATA
         )
@@ -47,7 +50,7 @@ class TestLogic(BaseTest):
         form = response.context['form']
         self.assertIn('slug', form.errors)
         self.assertEqual(form.errors['slug'][0], SLUG_ERROR_MSG)
-        self.assertEqual(Note.objects.count(), 1)
+        self.assertEqual(Note.objects.count(), initial_count)
 
     def test_slug_auto_generated_if_empty(self):
         """Если slug пустой, генерация через pytils."""
@@ -74,14 +77,16 @@ class TestLogic(BaseTest):
 
     def test_author_can_delete_note(self):
         """Автор может удалить свою заметку."""
+        initial_count = Note.objects.count()
         url = reverse('notes:delete', args=(self.note.slug,))
         response = self.author_client.post(url)
         self.assertRedirects(response, SUCCESS_URL)
-        self.assertEqual(Note.objects.count(), 0)
+        self.assertEqual(Note.objects.count(), initial_count - 1)
 
     def test_other_user_cannot_delete_other_note(self):
         """Другой пользователь не может удалить чужую заметку."""
+        initial_count = Note.objects.count()
         url = reverse('notes:delete', args=(self.note.slug,))
         response = self.other_client.post(url)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-        self.assertEqual(Note.objects.count(), 1)
+        self.assertEqual(Note.objects.count(), initial_count)
