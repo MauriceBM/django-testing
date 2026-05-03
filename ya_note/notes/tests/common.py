@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.test import Client
+from django.test import Client, TestCase
 
 from notes.models import Note
 
@@ -30,3 +30,21 @@ def get_logged_client(user):
     client = Client()
     client.force_login(user)
     return client
+
+
+class BaseTest(TestCase):
+    """Базовый класс pour les tests avec données et clients communs."""
+
+    @classmethod
+    def setUpTestData(cls):
+        """Création des données de test communes."""
+        cls.author = create_test_user('author')
+        cls.other_user = create_test_user('other')
+        cls.note = create_test_note(
+            'Test', 'Text', 'test', cls.author
+        )
+        cls.other_note = create_test_note(
+            'Other', 'Other text', 'other', cls.other_user
+        )
+        cls.author_client = get_logged_client(cls.author)
+        cls.other_client = get_logged_client(cls.other_user)
