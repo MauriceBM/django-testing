@@ -1,3 +1,4 @@
+"""Тесты бизнес-логики новостей."""
 from http import HTTPStatus
 
 import pytest
@@ -16,14 +17,18 @@ HACK_TEXT = 'Попытка взлома'
 BAD_WORD_ERROR = 'Комментарий содержит запрещённые слова.'
 
 
+# === Тесты создания комментария ===
 def test_anonymous_cannot_post_comment(client, news):
     """Анонимный пользователь не может отправить комментарий."""
+    # Arrange
     url = reverse(DETAIL_URL_NAME, args=(news.id,))
     data = {'text': COMMENT_TEXT}
     initial_count = Comment.objects.count()
 
+    # Act
     response = client.post(url, data)
 
+    # Assert
     expected_url = f"{LOGIN_URL}?next={url}"
     assertRedirects(response, expected_url)
     assert Comment.objects.count() == initial_count
@@ -31,12 +36,15 @@ def test_anonymous_cannot_post_comment(client, news):
 
 def test_authenticated_user_can_post_comment(author_client, news):
     """Авторизованный пользователь может отправить комментарий."""
+    # Arrange
     url = reverse(DETAIL_URL_NAME, args=(news.id,))
     data = {'text': 'мой комментарий'}
     initial_count = Comment.objects.count()
 
+    # Act
     response = author_client.post(url, data)
 
+    # Assert
     assert response.status_code == HTTPStatus.FOUND
     expected_url = reverse(DETAIL_URL_NAME, args=(news.id,))
     assert response.url.startswith(expected_url)
@@ -45,17 +53,21 @@ def test_authenticated_user_can_post_comment(author_client, news):
     assert comment.text == 'мой комментарий'
 
 
+# === Тесты фильтрации запрещённых слов ===
 @pytest.mark.parametrize('bad_word', BAD_WORDS)
 def test_comment_with_bad_words_not_published(
     author_client, news, bad_word
 ):
     """Комментарий с запрещёнными словами не публикуется."""
+    # Arrange
     url = reverse(DETAIL_URL_NAME, args=(news.id,))
     data = {'text': f'Плохое слово: {bad_word}'}
     initial_count = Comment.objects.count()
 
+    # Act
     response = author_client.post(url, data)
 
+    # Assert
     form = response.context.get('form')
     assert form is not None
     assert 'text' in form.errors
@@ -63,13 +75,17 @@ def test_comment_with_bad_words_not_published(
     assert Comment.objects.count() == initial_count
 
 
+# === Тесты редактирования комментария ===
 def test_author_can_edit_own_comment(author_client, comment):
     """Автор может редактировать свой комментарий."""
+    # Arrange
     edit_url = reverse('news:edit', args=(comment.id,))
     data = {'text': EDITED_TEXT}
 
+    # Act
     response = author_client.post(edit_url, data)
 
+    # Assert
     assert response.status_code == HTTPStatus.FOUND
     expected_url = reverse(DETAIL_URL_NAME, args=(comment.news.id,))
     assert response.url.startswith(expected_url)
@@ -81,24 +97,31 @@ def test_other_user_cannot_edit_others_comment(
     not_author_client, comment
 ):
     """Другой пользователь не может редактировать чужой комментарий."""
+    # Arrange
     edit_url = reverse('news:edit', args=(comment.id,))
     original_text = comment.text
     data = {'text': HACK_TEXT}
 
+    # Act
     response = not_author_client.post(edit_url, data)
 
+    # Assert
     assert response.status_code == HTTPStatus.NOT_FOUND
     comment.refresh_from_db()
     assert comment.text == original_text
 
 
+# === Тесты удаления комментария ===
 def test_author_can_delete_own_comment(author_client, comment):
     """Автор может удалить свой комментарий."""
+    # Arrange
     delete_url = reverse('news:delete', args=(comment.id,))
     initial_count = Comment.objects.count()
 
+    # Act
     response = author_client.post(delete_url)
 
+    # Assert
     assert response.status_code == HTTPStatus.FOUND
     expected_url = reverse(DETAIL_URL_NAME, args=(comment.news.id,))
     assert response.url.startswith(expected_url)
@@ -109,10 +132,13 @@ def test_other_user_cannot_delete_others_comment(
     not_author_client, comment
 ):
     """Другой пользователь не может удалить чужой комментарий."""
+    # Arrange
     delete_url = reverse('news:delete', args=(comment.id,))
     initial_count = Comment.objects.count()
 
+    # Act
     response = not_author_client.post(delete_url)
 
+    # Assert
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert Comment.objects.count() == initial_count

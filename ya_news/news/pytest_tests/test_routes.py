@@ -1,3 +1,4 @@
+"""Тесты маршрутов и прав доступа."""
 from http import HTTPStatus
 
 import pytest
@@ -19,29 +20,38 @@ AUTH_GET_URLS = ('users:login', 'users:signup')
 
 def test_home_availability_for_anonymous(client):
     """Главная страница доступна анонимному пользователю."""
+    # Arrange & Act
     response = client.get(HOME_URL)
 
+    # Assert
     assert response.status_code == HTTPStatus.OK
 
 
 def test_news_detail_availability_for_anonymous(client, news):
     """Страница отдельной новости доступна анонимному пользователю."""
+    # Arrange
     url = reverse(DETAIL_URL_NAME, args=(news.id,))
 
+    # Act
     response = client.get(url)
 
+    # Assert
     assert response.status_code == HTTPStatus.OK
 
 
+# === Тесты доступа к действиям с комментариями ===
 @pytest.mark.parametrize('url_name', COMMENT_ACTION_URLS)
 def test_comment_edit_delete_accessible_only_author(
     author_client, comment, url_name
 ):
     """Страницы редактирования и удаления доступны автору комментария."""
+    # Arrange
     url = reverse(url_name, args=(comment.id,))
 
+    # Act
     response = author_client.get(url)
 
+    # Assert
     assert response.status_code == HTTPStatus.OK
 
 
@@ -50,10 +60,13 @@ def test_anonymous_redirected_to_login_for_comment_edit_delete(
     client, comment, url_name
 ):
     """Аноним перенаправляется на вход при доступе к ред./удалению."""
+    # Arrange
     url = reverse(url_name, args=(comment.id,))
 
+    # Act
     response = client.get(url)
 
+    # Assert
     expected_url = f"{LOGIN_URL}?next={url}"
     assertRedirects(response, expected_url)
 
@@ -63,25 +76,35 @@ def test_other_user_cannot_access_comment_edit_delete(
     not_author_client, comment, url_name
 ):
     """Другой пользователь не может получить доступ к ред./удалению."""
+    # Arrange
     url = reverse(url_name, args=(comment.id,))
 
+    # Act
     response = not_author_client.get(url)
 
+    # Assert
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
+# === Тесты доступности страниц аутентификации ===
 @pytest.mark.parametrize('url_name', AUTH_GET_URLS)
 def test_auth_get_pages_available_for_anonymous(client, url_name):
     """Страницы входа и регистрации доступны анонимам (GET)."""
+    # Arrange
     url = reverse(url_name)
 
+    # Act
     response = client.get(url)
 
+    # Assert
     assert response.status_code == HTTPStatus.OK
 
 
 def test_logout_page_available_for_anonymous(client):
     """Страница выхода доступна анонимам (POST)."""
+    # Arrange & Act
     response = client.post(LOGOUT_URL)
 
+    # Assert
+    # Logout обычно возвращает 302 (redirect) или 200 (OK)
     assert response.status_code in (HTTPStatus.OK, HTTPStatus.FOUND)
