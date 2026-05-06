@@ -9,6 +9,9 @@ from news.models import Comment
 from news.pytest_tests.conftest import BAD_WORDS
 from news.pytest_tests.urls import LOGIN_URL, DETAIL_URL_NAME
 
+EDIT_URL_NAME = 'news:edit'
+DELETE_URL_NAME = 'news:delete'
+
 pytestmark = pytest.mark.django_db
 
 COMMENT_TEXT = 'Текст комментария'

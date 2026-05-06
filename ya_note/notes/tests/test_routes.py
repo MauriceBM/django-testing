@@ -6,6 +6,9 @@ from django.urls import reverse
 from notes.tests.common import BaseTest
 
 LOGIN_PATH = '/auth/login/'
+HOME_URL_NAME = 'notes:home'
+LOGOUT_URL_NAME = 'users:logout'
+
 PAGES_WITHOUT_ARGS = ('notes:list', 'notes:add', 'notes:success')
 PAGES_WITH_NOTE_ARG = ('notes:detail', 'notes:edit', 'notes:delete')
 AUTH_GET_PAGES = ('users:login', 'users:signup')
@@ -74,5 +77,5 @@ class TestRoutes(BaseTest):
         """Страница выхода доступна всем (POST)."""
         url = reverse('users:logout')
         response = self.client.post(url)
-        # В данном проекте logout возвращает 200 OK
+
         self.assertEqual(response.status_code, HTTPStatus.OK)
