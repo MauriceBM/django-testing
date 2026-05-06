@@ -16,18 +16,12 @@ class TestRoutes(BaseTest):
 
     def test_home_page_available_for_anonymous(self):
         """Главная страница доступна анонимному пользователю."""
-        # Arrange
         url = reverse('notes:home')
-
-        # Act
         response = self.client.get(url)
-
-        # Assert
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_pages_available_for_authenticated_user(self):
         """Страницы списка, добавления и успеха доступны авторизованному."""
-        # Act & Assert (via subTest)
         for name in PAGES_WITHOUT_ARGS:
             with self.subTest(page=name):
                 url = reverse(name)
@@ -36,7 +30,6 @@ class TestRoutes(BaseTest):
 
     def test_pages_for_note_accessible_by_author(self):
         """Страницы заметки, редактирования и удаления доступны автору."""
-        # Act & Assert (via subTest)
         for name in PAGES_WITH_NOTE_ARG:
             with self.subTest(page=name):
                 url = reverse(name, args=(self.note.slug,))
@@ -45,7 +38,6 @@ class TestRoutes(BaseTest):
 
     def test_pages_for_note_return_404_for_other_user(self):
         """Другой пользователь получает 404 при доступе к страницам заметки."""
-        # Act & Assert (via subTest)
         for name in PAGES_WITH_NOTE_ARG:
             with self.subTest(page=name):
                 url = reverse(name, args=(self.note.slug,))
@@ -54,7 +46,6 @@ class TestRoutes(BaseTest):
 
     def test_anonymous_redirected_list_add_success(self):
         """Аноним перенаправляется на логин для списков и создания."""
-        # Act & Assert (via subTest)
         for name in PAGES_WITHOUT_ARGS:
             with self.subTest(page=name):
                 url = reverse(name)
@@ -64,7 +55,6 @@ class TestRoutes(BaseTest):
 
     def test_anonymous_redirected_note_pages(self):
         """Аноним перенаправляется на логин для страниц заметок."""
-        # Act & Assert (via subTest)
         for name in PAGES_WITH_NOTE_ARG:
             with self.subTest(page=name):
                 url = reverse(name, args=(self.note.slug,))
@@ -74,7 +64,6 @@ class TestRoutes(BaseTest):
 
     def test_auth_pages_get_available_for_all_users(self):
         """Страницы регистрации и входа доступны всем (GET)."""
-        # Act & Assert (via subTest)
         for name in AUTH_GET_PAGES:
             with self.subTest(page=name):
                 url = reverse(name)
@@ -83,13 +72,7 @@ class TestRoutes(BaseTest):
 
     def test_logout_page_available_for_all_users(self):
         """Страница выхода доступна всем (POST)."""
-        # Arrange
         url = reverse('users:logout')
-
-        # Act
         response = self.client.post(url)
-
-        # Assert
-        self.assertIn(
-            response.status_code, (HTTPStatus.OK, HTTPStatus.FOUND)
-        )
+        # Logout (302)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
