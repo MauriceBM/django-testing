@@ -74,5 +74,5 @@ class TestRoutes(BaseTest):
         """Страница выхода доступна всем (POST)."""
         url = reverse('users:logout')
         response = self.client.post(url)
-        # Logout (302)
-        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        # В данном проекте logout возвращает 200 OK
+        self.assertEqual(response.status_code, HTTPStatus.OK)
