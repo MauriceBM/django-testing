@@ -1,6 +1,8 @@
+"""Фикстуры для тестов приложения news."""
 import pytest
 from django.contrib.auth import get_user_model
 from django.test.client import Client
+from django.urls import reverse
 
 from news.models import News, Comment
 
@@ -19,7 +21,7 @@ def author(db):
 
 @pytest.fixture
 def not_author(db):
-    """Фикстура: другой пользователь (не автор)."""
+    """Фикстура: другой пользователь."""
     return User.objects.create_user(
         username='not_author', password='pass123'
     )
@@ -82,3 +84,21 @@ def news_with_comments(db, author, not_author, news):
         comment.created = date
         comment.save()
     return news
+
+
+@pytest.fixture
+def detail_url(news):
+    """URL детальной страницы новости."""
+    return reverse('news:detail', args=(news.id,))
+
+
+@pytest.fixture
+def edit_url(comment):
+    """URL редактирования комментария."""
+    return reverse('news:edit', args=(comment.id,))
+
+
+@pytest.fixture
+def delete_url(comment):
+    """URL удаления комментария."""
+    return reverse('news:delete', args=(comment.id,))
