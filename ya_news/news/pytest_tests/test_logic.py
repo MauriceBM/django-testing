@@ -36,7 +36,7 @@ def test_authenticated_user_can_post_comment(
     author_client, news, detail_url
 ):
     """Авторизованный пользователь может отправить комментарий."""
-    data = {'text': COMMENT_TEXT}
+    data = {'text': 'мой комментарий'}
     initial_count = Comment.objects.count()
 
     response = author_client.post(detail_url, data)
@@ -47,7 +47,7 @@ def test_authenticated_user_can_post_comment(
     assert Comment.objects.count() == initial_count + 1
 
     comment = Comment.objects.get()
-    assert comment.text == COMMENT_TEXT
+    assert comment.text == 'мой комментарий'
     assert comment.author == news.author
     assert comment.news == news
 
@@ -122,7 +122,7 @@ def test_other_user_cannot_delete_others_comment(
 ):
     """Другой пользователь не может удалить чужой комментарий."""
     initial_count = Comment.objects.count()
-# Act
+
     response = not_author_client.post(delete_url)
 
     assert response.status_code == HTTPStatus.NOT_FOUND
