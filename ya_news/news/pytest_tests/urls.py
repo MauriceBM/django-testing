@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-HOME_URL_NAME = reverse('news:home')
+HOME_URL = reverse('news:home')
 
 LOGIN_URL = reverse('users:login')
 SIGNUP_URL = reverse('users:signup')
